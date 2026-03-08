@@ -1,8 +1,11 @@
-elements.adaptive_mob = {
+runAfterLoad(function() {
+
+elements.neuron_mob = {
     color: "#33ffaa",
     behavior: behaviors.POWDER,
     category: "life",
     state: "solid",
+    density: 900,
 
     tick: function(pixel) {
 
@@ -16,10 +19,13 @@ elements.adaptive_mob = {
         }
 
         // cảm biến môi trường
+        let leftBlocked = !isEmpty(pixel.x-1,pixel.y,true);
+        let rightBlocked = !isEmpty(pixel.x+1,pixel.y,true);
+
         let stimulus = 0;
 
-        if (!isEmpty(pixel.x+1,pixel.y,true)) stimulus += 1;
-        if (!isEmpty(pixel.x-1,pixel.y,true)) stimulus -= 1;
+        if(leftBlocked) stimulus -= 1;
+        if(rightBlocked) stimulus += 1;
 
         // neuron activation
         let output = stimulus * pixel.weight + pixel.memory;
@@ -31,16 +37,24 @@ elements.adaptive_mob = {
             tryMove(pixel,pixel.x-1,pixel.y);
         }
 
-        // learning rule (thích nghi)
-        if(pixel.temp > 100){ // gặp lửa
-            pixel.weight -= 0.05;
+        // nhảy ngẫu nhiên
+        if(Math.random() < 0.05){
+            tryMove(pixel,pixel.x,pixel.y-1);
         }
 
-        if(pixel.temp < 20){ // môi trường tốt
+        // thích nghi môi trường
+        if(pixel.temp > 80){ 
+            pixel.weight -= 0.02;
+        }
+
+        if(pixel.temp < 20){ 
             pixel.weight += 0.01;
         }
 
         // memory decay
         pixel.memory *= 0.9;
+
     }
 };
+
+});
