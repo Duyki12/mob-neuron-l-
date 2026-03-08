@@ -1,21 +1,14 @@
-// Neuron element mod for Sandboxels
-
-if (!elements.neuron) {
-
 elements.neuron = {
     color: "#ff66cc",
     category: "machines",
     state: "solid",
-    density: 2000,
     conduct: 1,
 
     tick: function(pixel) {
 
         if (pixel.charge) {
 
-            var dirs = [
-                [1,0],[-1,0],[0,1],[0,-1]
-            ];
+            var dirs = [[1,0],[-1,0],[0,1],[0,-1]];
 
             for (var i = 0; i < dirs.length; i++) {
 
@@ -38,5 +31,3 @@ elements.neuron = {
 
     }
 };
-
-}
