@@ -1,35 +1,42 @@
+// Neuron element mod for Sandboxels
+
+if (!elements.neuron) {
+
 elements.neuron = {
     color: "#ff66cc",
     category: "machines",
     state: "solid",
+    density: 2000,
     conduct: 1,
 
     tick: function(pixel) {
 
         if (pixel.charge) {
 
-            let neighbors = [
+            var dirs = [
                 [1,0],[-1,0],[0,1],[0,-1]
             ];
 
-            neighbors.forEach(d => {
+            for (var i = 0; i < dirs.length; i++) {
 
-                let x = pixel.x + d[0];
-                let y = pixel.y + d[1];
+                var x = pixel.x + dirs[i][0];
+                var y = pixel.y + dirs[i][1];
 
                 if (!isEmpty(x,y,true)) {
 
-                    let p = pixelMap[x][y];
+                    var p = pixelMap[x][y];
 
-                    if (p.element === "neuron") {
+                    if (elements[p.element].conduct) {
                         p.charge = 1;
                     }
 
                 }
 
-            });
+            }
 
         }
 
     }
 };
+
+}
