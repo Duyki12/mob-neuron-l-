@@ -1,45 +1,113 @@
-elements.neuron_mob = {
-    color: "#33ffaa",
-    behavior: behaviors.POWDER,
+// ======================
+// NEURON CELL
+// ======================
+
+elements.neuron = {
+    color: "#00ff88",
+
+    behavior: [
+        "XX|XX|XX",
+        "XX|XX|XX",
+        "XX|XX|XX"
+    ],
+
     category: "life",
     state: "solid",
-    density: 900,
+    density: 1200,
+
+    properties: {
+        charge: 0,
+        threshold: 5,
+        cooldown: 0
+    },
 
     tick: function(pixel) {
 
-        if(pixel.weight === undefined){
-            pixel.weight = Math.random()*2-1;
+        // giảm cooldown
+        if(pixel.cooldown > 0){
+            pixel.cooldown--;
         }
 
-        if(pixel.memory === undefined){
-            pixel.memory = 0;
+        // nhận tín hiệu từ xung quanh
+        let dirs = [
+            [1,0],[-1,0],[0,1],[0,-1]
+        ];
+
+        for(let i=0;i<dirs.length;i++){
+
+            let x = pixel.x + dirs[i][0];
+            let y = pixel.y + dirs[i][1];
+
+            if(!isEmpty(x,y,true)){
+
+                let other = pixelMap[x][y];
+
+                if(other.element == "neuron_spike"){
+                    pixel.charge += 1;
+                }
+
+            }
         }
 
-        let stimulus = 0;
+        // đạt ngưỡng → phát xung
+        if(pixel.charge >= pixel.threshold && pixel.cooldown == 0){
 
-        if (!isEmpty(pixel.x+1,pixel.y,true)) stimulus += 1;
-        if (!isEmpty(pixel.x-1,pixel.y,true)) stimulus -= 1;
+            pixel.cooldown = 20;
+            pixel.charge = 0;
 
-        let output = stimulus * pixel.weight + pixel.memory;
+            // tạo spike xung quanh
+            for(let i=0;i<dirs.length;i++){
 
-        if(output > 0){
-            tryMove(pixel,pixel.x+1,pixel.y);
-        } else {
-            tryMove(pixel,pixel.x-1,pixel.y);
+                let x = pixel.x + dirs[i][0];
+                let y = pixel.y + dirs[i][1];
+
+                if(isEmpty(x,y)){
+                    createPixel("neuron_spike",x,y);
+                }
+
+            }
+
         }
 
-        if(Math.random() < 0.05){
-            tryMove(pixel,pixel.x,pixel.y-1);
-        }
-
-        if(pixel.temp > 80){
-            pixel.weight -= 0.02;
-        }
-
-        if(pixel.temp < 20){
-            pixel.weight += 0.01;
-        }
-
-        pixel.memory *= 0.9;
     }
+
+};
+
+
+
+// ======================
+// NEURON SPIKE
+// ======================
+
+elements.neuron_spike = {
+
+    color:"#ffff00",
+
+    behavior:[
+    "XX|XX|XX",
+    "XX|DL|XX",
+    "XX|XX|XX"
+    ],
+
+    category:"energy",
+    state:"gas",
+    density:1,
+
+    tick:function(pixel){
+
+        // lan truyền
+        if(Math.random() < 0.3){
+
+            let dirs = [
+                [1,0],[-1,0],[0,1],[0,-1]
+            ];
+
+            let d = dirs[Math.floor(Math.random()*dirs.length)];
+
+            tryMove(pixel,pixel.x+d[0],pixel.y+d[1]);
+
+        }
+
+    }
+
 };
